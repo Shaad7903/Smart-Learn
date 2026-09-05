@@ -1,10 +1,10 @@
 import React from 'react';
 import {
     StyleSheet,
-    TouchableOpacity,
     StyleProp,
     ViewStyle,
     TextStyle,
+    Pressable,
 } from 'react-native';
 import Text from '../Text';
 import { PRIMARY_COLOR } from '../../config/themes';
@@ -29,8 +29,7 @@ export const Button: React.FC<ButtonProps> = ({
     const isPrimary = variant === 'primary';
 
     return (
-        <TouchableOpacity
-            activeOpacity={0.8}
+        <Pressable
             onPress={onPress}
             disabled={disabled}
             style={[
@@ -50,7 +49,7 @@ export const Button: React.FC<ButtonProps> = ({
             >
                 {title}
             </Text>
-        </TouchableOpacity>
+        </Pressable>
     );
 };
 

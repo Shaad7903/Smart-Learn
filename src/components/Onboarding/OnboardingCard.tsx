@@ -46,7 +46,7 @@ export const OnboardingCard: React.FC<OnboardingCardProps> = ({
                     {/* Left content area */}
                     <View style={styles.contentArea}>
                         <View>
-                            <Text weight="bold" style={styles.title}>
+                            <Text weight="medium" style={styles.title}>
                                 {title}
                             </Text>
 

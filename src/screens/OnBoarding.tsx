@@ -3,38 +3,56 @@ import {
     StyleSheet,
     View,
     Image,
-    ScrollView,
     Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BG_COLOR, TEXT_COLOR } from '../config/themes';
-import { OnboardingCard, OnboardingBackCard, Button } from '../components';
+import { Text, OnboardingCard, OnboardingBackCard, Button } from '../components';
+import { navigate } from '../services/NavigationService';
 
-const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
+
+// Baseline design dimensions (standard mobile reference)
+const BASE_WIDTH = 375;
+const BASE_HEIGHT = 812;
+const scale = Math.min(Math.max(Math.min(width / BASE_WIDTH, height / BASE_HEIGHT), 0.72), 1);
 
 const OnBoarding = () => {
+    const buttonHeightStyle =
+        scale < 1
+            ? { height: Math.max(Math.round(56 * scale), 46) }
+            : undefined;
+
     return (
         <SafeAreaView style={styles.safeArea}>
             {/* Background decorative curved arc */}
             <View style={styles.bgArcContainer} pointerEvents="none">
-                <Image source={require('../assets/vectors/OnboardingVector[Large].png')} resizeMode='contain' style={styles.vector} />
+                <Image
+                    source={require('../assets/vectors/OnboardingVector[Large].png')}
+                    resizeMode="contain"
+                    style={styles.vector}
+                />
             </View>
 
-            <ScrollView
-                contentContainerStyle={styles.scrollContainer}
-                showsVerticalScrollIndicator={false}
-                bounces={false}
-            >
-                {/* Header with App Logo & Title */}
-                <View style={styles.outerBadge}>
-                    <View style={styles.badge}>
-                        <Image source={require('../assets/images/Logo.png')} style={styles.logo} />
+
+            <View style={styles.mainContainer}>
+                <View style={styles.header}>
+                    <View style={styles.outerBadge}>
+                        <View style={styles.badge}>
+                            <Image
+                                source={require('../assets/images/Logo.png')}
+                                style={styles.logo}
+                            />
+                        </View>
                     </View>
+                    <Text weight="medium" style={styles.brandTitle}>
+                        SmartLearn
+                    </Text>
                 </View>
 
-                {/* Stacked Cards Section */}
+
                 <View style={styles.cardsWrapper}>
-                    {/* Pink Back Card: Instant Feedback + Bulb */}
+
                     <View style={styles.pinkCardContainer}>
                         <OnboardingBackCard
                             text="Instant Feedback"
@@ -50,7 +68,7 @@ const OnBoarding = () => {
                         />
                     </View>
 
-                    {/* Lime Back Card: Fun Games & Activities */}
+
                     <OnboardingBackCard
                         text="Fun Games & Activities"
                         color="#DFF28A"
@@ -59,26 +77,27 @@ const OnBoarding = () => {
                         style={styles.limeBackCard}
                     />
 
-                    {/* Front Onboarding Card */}
+
                     <View style={styles.cardContainer}>
                         <OnboardingCard />
                     </View>
                 </View>
 
-                {/* Bottom Action Buttons */}
                 <View style={styles.buttonSection}>
                     <Button
                         title="Sign up"
                         variant="primary"
-                        onPress={() => { }}
+                        style={buttonHeightStyle}
+                        onPress={() => { navigate('Main') }}
                     />
                     <Button
                         title="Log in"
                         variant="outline"
-                        onPress={() => { }}
+                        style={buttonHeightStyle}
+                        onPress={() => { navigate('Main') }}
                     />
                 </View>
-            </ScrollView>
+            </View>
         </SafeAreaView>
     );
 };
@@ -92,72 +111,60 @@ const styles = StyleSheet.create({
     },
     bgArcContainer: {
         position: 'absolute',
-        top: -SCREEN_WIDTH * 0.10,
+        top: -width * 0.10,
         left: 75,
-        width: SCREEN_WIDTH,
-        height: SCREEN_WIDTH * (1012 / 665),
+        width: width,
+        height: width * (1012 / 665),
         zIndex: 0,
     },
     vector: {
         width: '100%',
         height: '100%',
     },
-    scrollContainer: {
-        flexGrow: 1,
+    mainContainer: {
+        flex: 1,
         paddingHorizontal: 20,
-        paddingTop: 12,
-        paddingBottom: 28,
+        paddingTop: Math.round(40 * scale),
+        paddingBottom: Math.round(20 * scale),
         justifyContent: 'space-between',
-        alignItems: 'center',
-    },
-    outerBadge: {
-        width: 120,
-        height: 120,
-        borderRadius: 60,
-        backgroundColor: '#F0F4F8',
-        justifyContent: 'center',
-        alignItems: 'center',
-        marginBottom: 20,
-    },
-    badge: {
-        width: 95,
-        height: 95,
-        borderRadius: 50,
-        backgroundColor: '#FFFFFF',
-        justifyContent: 'center',
         alignItems: 'center',
     },
     header: {
         alignItems: 'center',
-        marginTop: 6,
     },
-    logoCircle: {
-        width: 72,
-        height: 72,
-        borderRadius: 36,
-        backgroundColor: '#EFF5FC',
+    outerBadge: {
+        width: Math.round(110 * scale),
+        height: Math.round(110 * scale),
+        borderRadius: Math.round(55 * scale),
+        backgroundColor: '#F0F4F8',
         justifyContent: 'center',
         alignItems: 'center',
-        shadowColor: '#1C274C',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.04,
-        shadowRadius: 8,
-        elevation: 1,
+        marginBottom: Math.round(8 * scale),
+    },
+    badge: {
+        width: Math.round(88 * scale),
+        height: Math.round(88 * scale),
+        borderRadius: Math.round(44 * scale),
+        backgroundColor: '#FFFFFF',
+        justifyContent: 'center',
+        alignItems: 'center',
     },
     logo: {
-        width: 40,
-        height: 30,
+        width: Math.round(40 * scale),
+        height: Math.round(30 * scale),
+        resizeMode: 'contain',
     },
     brandTitle: {
-        fontSize: 22,
+        fontSize: Math.round(24 * scale),
         color: '#080C1E',
-        marginTop: 10,
-        letterSpacing: -0.2,
+        letterSpacing: -0.3,
+        textAlign: 'center',
     },
     cardsWrapper: {
         width: '100%',
         alignItems: 'center',
-        marginTop: 15,
+        transform: [{ scale }],
+        marginVertical: Math.round(((scale - 1) * 440) / 2),
     },
     pinkCardContainer: {
         position: 'relative',
@@ -189,6 +196,6 @@ const styles = StyleSheet.create({
     },
     buttonSection: {
         width: '100%',
-        gap: 6,
+        gap: Math.max(Math.round(6 * scale), 4),
     },
 });

@@ -5,6 +5,7 @@ import { navigationRef } from '../services/NavigationService';
 import Splash from '../screens/Splash';
 import OnBoarding from '../screens/OnBoarding';
 import { RootStackParamList } from '../types';
+import BottomTabNavigator from './BottomTabNavigator';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -14,6 +15,7 @@ const Routes = () => {
             <Stack.Navigator screenOptions={{ headerShown: false, gestureEnabled: true }}>
                 <Stack.Screen name="Splash" component={Splash} />
                 <Stack.Screen name="OnBoarding" component={OnBoarding} />
+                <Stack.Screen name="Main" component={BottomTabNavigator} />
             </Stack.Navigator>
         </NavigationContainer>
     );
