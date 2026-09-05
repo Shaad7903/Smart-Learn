@@ -6,6 +6,7 @@ import com.facebook.react.ReactApplication
 import com.facebook.react.ReactHost
 import com.facebook.react.ReactNativeApplicationEntryPoint.loadReactNative
 import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
+import com.facebook.react.common.assets.ReactFontManager
 
 class MainApplication : Application(), ReactApplication {
 
@@ -23,5 +24,6 @@ class MainApplication : Application(), ReactApplication {
   override fun onCreate() {
     super.onCreate()
     loadReactNative(this)
+    ReactFontManager.getInstance().addCustomFont(this, "Inter", R.font.inter)
   }
 }
