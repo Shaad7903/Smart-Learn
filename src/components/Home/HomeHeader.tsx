@@ -33,7 +33,6 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
 }) => {
     return (
         <View style={styles.container}>
-            {/* Left: User Avatar & Greetings */}
             <View style={styles.profileSection}>
                 <Pressable
                     onPress={onPressAvatar}
@@ -56,7 +55,6 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
                 </View>
             </View>
 
-            {/* Right: Language Dropdown & Notification Bell */}
             <View style={styles.actionsSection}>
                 <Pressable
                     style={styles.languagePill}

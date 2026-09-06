@@ -80,17 +80,16 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
                         <Pressable
                             key={tab.id}
                             onPress={() => onTabPress?.(tab.id)}
-                            style={[
+                            style={({ pressed }) => [
                                 styles.pill,
                                 isSelected ? styles.activePill : styles.inactivePill,
+                                pressed && styles.pressedPill,
                             ]}
                         >
-                            {/* Icon if provided */}
                             {renderedIcon ? (
                                 <View style={styles.iconContainer}>{renderedIcon}</View>
                             ) : null}
 
-                            {/* Label */}
                             <Text
                                 weight="medium"
                                 style={[
@@ -101,7 +100,6 @@ export const CategoryTabs: React.FC<CategoryTabsProps> = ({
                                 {tab.label}
                             </Text>
 
-                            {/* Count Badge */}
                             {formattedCount !== null ? (
                                 <View
                                     style={[
@@ -160,6 +158,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         borderWidth: 1,
         borderColor: '#0000000D',
+    },
+    pressedPill: {
+        opacity: 0.75,
     },
     iconContainer: {
         marginRight: 8,

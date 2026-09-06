@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+    View,
     ScrollView,
     StyleSheet,
     StyleProp,
@@ -7,6 +8,12 @@ import {
 } from 'react-native';
 import LearningCard, { LearningCardData } from './LearningCard';
 import CardConnector from './CardConnector';
+import Text from '../Text';
+import Animated, {
+    FadeIn,
+    FadeOut,
+    LinearTransition,
+} from 'react-native-reanimated';
 
 export interface LearningCardsListProps {
     cards: LearningCardData[];
@@ -19,6 +26,16 @@ export const LearningCardsList: React.FC<LearningCardsListProps> = ({
     style,
     contentContainerStyle,
 }) => {
+    if (cards.length === 0) {
+        return (
+            <View style={[styles.container, styles.emptyContainer, style]}>
+                <Text weight="medium" style={styles.emptyText}>
+                    No lessons available in this category yet.
+                </Text>
+            </View>
+        );
+    }
+
     return (
         <ScrollView
             horizontal
@@ -32,7 +49,13 @@ export const LearningCardsList: React.FC<LearningCardsListProps> = ({
                 const nextCard = !isLast ? cards[index + 1] : null;
 
                 return (
-                    <React.Fragment key={card.id}>
+                    <Animated.View
+                        key={card.id}
+                        entering={FadeIn.duration(200)}
+                        exiting={FadeOut.duration(150)}
+                        layout={LinearTransition.duration(200)}
+                        style={styles.cardItemRow}
+                    >
                         <LearningCard
                             data={card}
                             isLast={isLast}
@@ -43,7 +66,7 @@ export const LearningCardsList: React.FC<LearningCardsListProps> = ({
                                 rightColor={nextCard.backgroundColor}
                             />
                         )}
-                    </React.Fragment>
+                    </Animated.View>
                 );
             })}
         </ScrollView>
@@ -57,6 +80,20 @@ const styles = StyleSheet.create({
     scrollContent: {
         paddingHorizontal: 20,
         paddingVertical: 12,
+    },
+    cardItemRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    emptyContainer: {
+        paddingHorizontal: 24,
+        paddingVertical: 48,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    emptyText: {
+        fontSize: 14,
+        color: '#708892',
     },
 });
 

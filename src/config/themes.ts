@@ -11,7 +11,6 @@ export const FONTS = {
     bold: 'Inter-Bold',
     extraBold: 'Inter-ExtraBold',
     black: 'Inter-Black',
-    // Generic family name registered in ReactFontManager / iOS
     family: 'Inter',
 } as const;
 
@@ -34,9 +33,6 @@ export type FontWeight =
     | 'extraBold'
     | 'black';
 
-/**
- * Returns the appropriate Inter font family string based on weight and italic style
- */
 export const getFontFamily = (
     weight: FontWeight = 'normal',
     italic: boolean = false,

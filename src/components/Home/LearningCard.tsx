@@ -13,6 +13,7 @@ import Svg, { Path } from 'react-native-svg';
 import { BookOpen, Clock, Play } from 'lucide-react-native';
 import Text from '../Text';
 import { PRIMARY_COLOR, TEXT_COLOR } from '../../config/themes';
+import { BlurView } from '@sbaiahmed1/react-native-blur';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 export const CARD_WIDTH = Math.min(Math.round(SCREEN_WIDTH * 0.74), 295);
@@ -60,25 +61,22 @@ export const LearningCard: React.FC<LearningCardProps> = ({
     return (
         <View style={styles.outerWrapper}>
             <Pressable
-                style={[
+                style={({ pressed }) => [
                     styles.cardContainer,
                     { backgroundColor },
+                    pressed && styles.cardContainerPressed,
                     style,
                 ]}
                 onPress={onPressCard}
                 disabled={!onPressCard}
             >
-                {/* Background Vector Line */}
                 <View style={styles.vectorContainer} pointerEvents="none">
-                    <Image source={require('../../assets/vectors/LearnCardVector.png')} />
+                    <Image source={require('../../assets/vectors/LearnCardVector.png')} style={styles.vectorImage} resizeMode="cover" />
                 </View>
 
-                {/* Top Row: Icon + Meta Badges */}
                 <View style={styles.topRow}>
-                    {/* Circular White Icon */}
                     <View style={styles.iconCircle}>{icon}</View>
 
-                    {/* Meta Badges */}
                     <View style={styles.metaGroup}>
                         <View style={styles.metaBadge}>
                             <BookOpen size={13} color="#161A34" strokeWidth={2} />
@@ -96,17 +94,15 @@ export const LearningCard: React.FC<LearningCardProps> = ({
                     </View>
                 </View>
 
-                {/* Category & Title */}
                 <View style={styles.contentSection}>
                     <Text weight="medium" style={[styles.categoryText, { color: categoryColor }]}>
                         {category}
                     </Text>
-                    <Text weight="bold" style={styles.titleText}>
+                    <Text weight="medium" style={styles.titleText}>
                         {title}
                     </Text>
                 </View>
 
-                {/* Center Illustration */}
                 <View style={styles.illustrationWrapper} pointerEvents="none">
                     <Image
                         source={illustrationSource}
@@ -115,12 +111,19 @@ export const LearningCard: React.FC<LearningCardProps> = ({
                     />
                 </View>
 
-                {/* Bottom Card / Start Learning Bar */}
                 <View style={styles.bottomCardWrapper}>
                     <Pressable
-                        style={styles.bottomCard}
+                        style={({ pressed }) => [
+                            styles.bottomCard,
+                            pressed && styles.bottomCardPressed,
+                        ]}
                         onPress={onPressStart}
                     >
+                        <BlurView
+                            style={styles.blurView}
+                            blurType="light"
+                            blurAmount={1}
+                        />
                         <Text weight="semiBold" style={styles.startLearningText}>
                             Start learning
                         </Text>
@@ -150,13 +153,20 @@ const styles = StyleSheet.create({
         overflow: 'hidden',
         position: 'relative',
     },
+    cardContainerPressed: {
+        opacity: 0.88,
+    },
     vectorContainer: {
         position: 'absolute',
         bottom: 0,
         left: 0,
-        width: 280,
+        width: 300,
         height: 232,
         zIndex: 0,
+    },
+    vectorImage: {
+        width: '100%',
+        height: '100%',
     },
     topRow: {
         flexDirection: 'row',
@@ -171,8 +181,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         alignItems: 'center',
         justifyContent: 'center',
-        boxShadow: '0px 2px 8px 0px rgba(0, 0, 0, 0.04)',
-        elevation: 2,
     },
     metaGroup: {
         flexDirection: 'row',
@@ -203,22 +211,21 @@ const styles = StyleSheet.create({
         marginBottom: 4,
     },
     titleText: {
-        fontSize: 22,
-        lineHeight: 28,
+        fontSize: 28,
         color: TEXT_COLOR,
         letterSpacing: -0.4,
         maxWidth: 180,
     },
     illustrationWrapper: {
         flex: 1,
-        alignItems: 'center',
+        alignItems: 'flex-end',
         justifyContent: 'flex-end',
         zIndex: 1,
-        marginBottom: -16,
+        marginBottom: -45,
     },
     illustration: {
-        width: 190,
-        height: 165,
+        width: 210,
+        height: 185,
     },
     bottomCardWrapper: {
         zIndex: 3,
@@ -226,15 +233,23 @@ const styles = StyleSheet.create({
     },
     bottomCard: {
         backgroundColor: 'rgba(255, 255, 255, 0.72)',
-        borderRadius: 28,
+        borderRadius: 30,
+        overflow: 'hidden',
         paddingLeft: 20,
         paddingRight: 8,
-        paddingVertical: 8,
+        paddingVertical: 10,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         borderWidth: 1,
         borderColor: 'rgba(255, 255, 255, 0.8)',
+    },
+    bottomCardPressed: {
+        opacity: 0.75,
+    },
+    blurView: {
+        ...StyleSheet.absoluteFill,
+        borderRadius: 28,
     },
     startLearningText: {
         fontSize: 16,

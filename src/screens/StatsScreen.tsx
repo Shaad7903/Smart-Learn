@@ -1,16 +1,20 @@
 import React from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Text } from '../components';
-import { BG_COLOR, PRIMARY_COLOR, TYPOGRAPHY } from '../config/themes';
+import { StatsHeader, StreakCard, SkillProgressCard } from '../components';
+import { BG_COLOR } from '../config/themes';
 
 const StatsScreen = () => {
     return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.content}>
-                <Text style={styles.title}>Statistics</Text>
-                <Text style={styles.subtitle}>Track your learning milestones and progress.</Text>
-            </View>
+        <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+            <StatsHeader title="Analytics" />
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.scrollContent}
+            >
+                <StreakCard style={styles.streakSection} />
+                <SkillProgressCard style={styles.progressSection} />
+            </ScrollView>
         </SafeAreaView>
     );
 };
@@ -22,20 +26,14 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: BG_COLOR,
     },
-    content: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingHorizontal: 24,
+    scrollContent: {
+        paddingHorizontal: 20,
+        paddingBottom: 110,
     },
-    title: {
-        ...TYPOGRAPHY.h2,
-        color: PRIMARY_COLOR,
-        marginBottom: 8,
+    streakSection: {
+        marginTop: 8,
     },
-    subtitle: {
-        ...TYPOGRAPHY.bodyMedium,
-        color: '#666666',
-        textAlign: 'center',
+    progressSection: {
+        marginTop: 16,
     },
 });

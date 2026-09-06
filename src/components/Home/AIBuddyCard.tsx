@@ -11,7 +11,7 @@ import Svg, { Circle, Path } from 'react-native-svg';
 import Text from '../Text';
 import { PRIMARY_COLOR, TEXT_COLOR } from '../../config/themes';
 import { BookOpen, Clock, Play } from 'lucide-react-native';
-import { BlurView } from '@react-native-community/blur';
+import { BlurView } from '@sbaiahmed1/react-native-blur';
 
 export interface AIBuddyCardProps {
     buddyName?: string;
@@ -36,13 +36,11 @@ export const AIBuddyCard: React.FC<AIBuddyCardProps> = ({
     onPressCard,
     style,
 }) => {
-    // Math for circular progress ring (matches the ~76% black arc in the mockup)
     const ringSize = 48;
     const strokeWidth = 3.5;
     const center = ringSize / 2;
     const radius = center - strokeWidth;
     const circumference = 2 * Math.PI * radius;
-    // The design mockup shows a prominent ~76% progress arc with the gap on the upper right
     const arcCoverage = 0.76;
     const strokeDashoffset = circumference * (1 - arcCoverage);
 
@@ -52,16 +50,13 @@ export const AIBuddyCard: React.FC<AIBuddyCardProps> = ({
             onPress={onPressCard}
             disabled={!onPressCard}
         >
-            {/* Background Decorative Vector */}
             <Image
                 source={require('../../assets/vectors/AIbuddycardVector.png')}
                 style={styles.cardBgVector}
                 resizeMode="contain"
             />
 
-            {/* Top Section */}
             <View style={styles.topSection}>
-                {/* Left: AI Buddy Avatar & Speech */}
                 <View style={styles.buddyInfoWrapper}>
                     <View style={styles.avatarContainer}>
                         <Image
@@ -93,16 +88,15 @@ export const AIBuddyCard: React.FC<AIBuddyCardProps> = ({
                 />
             </View>
 
-            {/* Bottom Section: White Card */}
             <View style={styles.whiteCardContainer}>
                 <BlurView
                     style={StyleSheet.absoluteFill}
                     blurType="light"
                     blurAmount={7}
                     overlayColor="rgba(255, 255, 255, 0.5)"
+                    reducedTransparencyFallbackColor="white"
                 />
                 <View style={styles.whiteCard}>
-                    {/* Left Stuff*/}
                     <View style={styles.topicInfo}>
                         <Text weight="medium" style={styles.topicTitleText}>
                             {topicTitle}
@@ -123,7 +117,6 @@ export const AIBuddyCard: React.FC<AIBuddyCardProps> = ({
                         </View>
                     </View>
 
-                    {/* Right Stuff */}
                     <View style={styles.progressWrapper}>
                         <Text style={styles.progressText}>
                             <Text weight="normal" style={styles.progressPercentText}>
@@ -134,14 +127,12 @@ export const AIBuddyCard: React.FC<AIBuddyCardProps> = ({
                             </Text>
                         </Text>
 
-                        {/* Circular Progress Play Button */}
                         <Pressable
-                            style={styles.playButton}
+                            style={({ pressed }) => [styles.playButton, pressed && styles.playButtonPressed]}
                             onPress={onPressPlay}
                             disabled={!onPressPlay}
                         >
                             <Svg width={ringSize} height={ringSize}>
-                                {/* Track Circle */}
                                 <Circle
                                     cx={center}
                                     cy={center}
@@ -150,7 +141,6 @@ export const AIBuddyCard: React.FC<AIBuddyCardProps> = ({
                                     strokeWidth={strokeWidth}
                                     fill="none"
                                 />
-                                {/* Progress Arc */}
                                 <Circle
                                     cx={center}
                                     cy={center}
@@ -251,6 +241,10 @@ const styles = StyleSheet.create({
         width: 40,
         height: 40,
     },
+    bulbImage: {
+        width: '100%',
+        height: '100%',
+    },
     whiteCardContainer: {
         borderRadius: 32,
         overflow: 'hidden',
@@ -321,6 +315,9 @@ const styles = StyleSheet.create({
         shadowOpacity: 0.7,
         shadowRadius: 2,
         elevation: 2,
+    },
+    playButtonPressed: {
+        opacity: 0.75,
     },
     playIconWrapper: {
         position: 'absolute',

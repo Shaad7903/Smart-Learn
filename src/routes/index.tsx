@@ -4,6 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { navigationRef } from '../services/NavigationService';
 import Splash from '../screens/Splash';
 import OnBoarding from '../screens/OnBoarding';
+import LearnLetters from '../screens/LearnLetters';
 import { RootStackParamList } from '../types';
 import BottomTabNavigator from './BottomTabNavigator';
 
@@ -16,6 +17,7 @@ const Routes = () => {
                 <Stack.Screen name="Splash" component={Splash} />
                 <Stack.Screen name="OnBoarding" component={OnBoarding} />
                 <Stack.Screen name="Main" component={BottomTabNavigator} />
+                <Stack.Screen name="LearnLetters" component={LearnLetters} />
             </Stack.Navigator>
         </NavigationContainer>
     );

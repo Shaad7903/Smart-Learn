@@ -6,6 +6,8 @@ import {
     ImageSourcePropType,
     StyleProp,
     ViewStyle,
+    ImageStyle,
+    Pressable,
 } from 'react-native';
 
 import Text from '../Text';
@@ -18,6 +20,13 @@ export interface OnboardingCardProps {
     currentIndex?: number;
     totalCount?: number;
     imageSource?: ImageSourcePropType;
+    imageStyle?: StyleProp<ImageStyle>;
+    cardColor?: string;
+    badgeColor?: string;
+    dotColor?: string;
+    activeDotColor?: string;
+    inactiveDotColor?: string;
+    onDotPress?: (index: number) => void;
     style?: StyleProp<ViewStyle>;
 }
 
@@ -28,29 +37,36 @@ export const OnboardingCard: React.FC<OnboardingCardProps> = ({
     currentIndex = 0,
     totalCount = 3,
     imageSource = require('../../assets/images/Onboarding1.png'),
+    imageStyle,
+    cardColor,
+    badgeColor,
+    dotColor,
+    activeDotColor,
+    inactiveDotColor,
+    onDotPress,
     style,
 }) => {
+    const activeColor = activeDotColor || dotColor || PRIMARY_COLOR;
+    const inactiveColor = inactiveDotColor || (dotColor ? `${dotColor}40` : '#BDD0E8');
+
     return (
         <View style={[styles.wrapper, style]}>
             <View style={styles.starContainer} pointerEvents="none">
-                {/* Top Star */}
                 <Image source={require('../../assets/vectors/Star.png')} style={styles.starImage} />
             </View>
-            {/* Card wrapped with 7px padding and white border */}
             <View style={styles.cardBorderWrapper}>
-                <View style={styles.cardBox}>
+                <View style={[styles.cardBox, cardColor ? { backgroundColor: cardColor } : null]}>
                     <View style={styles.vectorOverlay} pointerEvents="none">
                         <Image source={require('../../assets/vectors/OnboardingVector[Small].png')} style={styles.cardVector} />
                     </View>
 
-                    {/* Left content area */}
                     <View style={styles.contentArea}>
                         <View>
                             <Text weight="medium" style={styles.title}>
                                 {title}
                             </Text>
 
-                            <View style={styles.badge}>
+                            <View style={[styles.badge, badgeColor ? { backgroundColor: badgeColor } : null]}>
                                 <Text weight="bold" style={styles.badgeText}>
                                     {badgeText}
                                 </Text>
@@ -61,16 +77,22 @@ export const OnboardingCard: React.FC<OnboardingCardProps> = ({
                             </Text>
 
                             <View style={styles.dots}>
-                                {Array.from({ length: totalCount }).map((_, index) => {
+                                {Array.from({ length: totalCount }).map((dotItem, index) => {
                                     const isActive = index === currentIndex;
                                     return (
-                                        <View
+                                        <Pressable
                                             key={index}
-                                            style={[
-                                                styles.dotBase,
-                                                isActive ? styles.activeDot : styles.inactiveDot,
-                                            ]}
-                                        />
+                                            onPress={() => onDotPress?.(index)}
+                                            hitSlop={8}
+                                        >
+                                            <View
+                                                style={[
+                                                    styles.dotBase,
+                                                    isActive ? styles.activeDot : styles.inactiveDot,
+                                                    { backgroundColor: isActive ? activeColor : inactiveColor },
+                                                ]}
+                                            />
+                                        </Pressable>
                                     );
                                 })}
                             </View>
@@ -80,7 +102,7 @@ export const OnboardingCard: React.FC<OnboardingCardProps> = ({
             </View>
             <Image
                 source={imageSource}
-                style={styles.characterImage}
+                style={[styles.characterImage, imageStyle]}
                 resizeMode="contain"
             />
         </View>
@@ -128,13 +150,12 @@ const styles = StyleSheet.create({
         position: 'absolute',
         top: 50,
         right: -37,
-
     },
     cardVector: {
         width: 200,
         height: 200,
         resizeMode: 'contain',
-        transform: [{ rotate: '0deg' }]
+        transform: [{ rotate: '0deg' }],
     },
     contentArea: {
         flex: 1,

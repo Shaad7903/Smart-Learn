@@ -21,32 +21,29 @@ export const CardConnector: React.FC<CardConnectorProps> = ({
     bottomBridgeY = 312,
     style,
 }) => {
-    // Total SVG width includes a 2px overlap on left & right to ensure zero subpixel gap
     const overlap = 2;
-    const totalW = gapWidth + 2 * overlap; // e.g. 18
-    const cx = totalW / 2; // e.g. 9
+    const totalWidth = gapWidth + 2 * overlap;
+    const centerX = totalWidth / 2;
 
-    const curveH = 8;
-    const waistH = 7;
-    const bridgeH = 2 * curveH + waistH; // 23
+    const curveHeight = 10;
+    const waistHeight = 10;
+    const bridgeHeight = 6 * curveHeight + waistHeight;
 
-    const renderBridge = (topY: number, key: string) => {
-        // Left wing curves from card edge (x=0) inwards to center waist (x=cx)
-        const dLeft = `M 0 ${topY} ` +
-            `C 0 ${topY + curveH * 0.55}, ${cx * 0.45} ${topY + curveH}, ${cx} ${topY + curveH} ` +
-            `L ${cx} ${topY + curveH + waistH} ` +
-            `C ${cx * 0.45} ${topY + curveH + waistH}, 0 ${topY + curveH + waistH + curveH * 0.45}, 0 ${topY + bridgeH} Z`;
+    const renderBridge = (topOffset: number, bridgeKey: string) => {
+        const pathDataLeft = `M 0 ${topOffset} ` +
+            `C 0 ${topOffset + curveHeight * 0.55}, ${centerX * 0.45} ${topOffset + curveHeight}, ${centerX} ${topOffset + curveHeight} ` +
+            `L ${centerX} ${topOffset + curveHeight + waistHeight} ` +
+            `C ${centerX * 0.45} ${topOffset + curveHeight + waistHeight}, 0 ${topOffset + curveHeight + waistHeight + curveHeight * 0.45}, 0 ${topOffset + bridgeHeight} Z`;
 
-        // Right wing curves from card edge (x=totalW) inwards to center waist (x=cx)
-        const dRight = `M ${totalW} ${topY} ` +
-            `C ${totalW} ${topY + curveH * 0.55}, ${totalW - cx * 0.45} ${topY + curveH}, ${cx} ${topY + curveH} ` +
-            `L ${cx} ${topY + curveH + waistH} ` +
-            `C ${totalW - cx * 0.45} ${topY + curveH + waistH}, ${totalW} ${topY + curveH + waistH + curveH * 0.45}, ${totalW} ${topY + bridgeH} Z`;
+        const pathDataRight = `M ${totalWidth} ${topOffset} ` +
+            `C ${totalWidth} ${topOffset + curveHeight * 0.55}, ${totalWidth - centerX * 0.45} ${topOffset + curveHeight}, ${centerX} ${topOffset + curveHeight} ` +
+            `L ${centerX} ${topOffset + curveHeight + waistHeight} ` +
+            `C ${totalWidth - centerX * 0.45} ${topOffset + curveHeight + waistHeight}, ${totalWidth} ${topOffset + curveHeight + waistHeight + curveHeight * 0.45}, ${totalWidth} ${topOffset + bridgeHeight} Z`;
 
         return (
-            <React.Fragment key={key}>
-                <Path d={dLeft} fill={leftColor} />
-                <Path d={dRight} fill={rightColor} />
+            <React.Fragment key={bridgeKey}>
+                <Path d={pathDataLeft} fill={leftColor} />
+                <Path d={pathDataRight} fill={rightColor} />
             </React.Fragment>
         );
     };
@@ -64,18 +61,15 @@ export const CardConnector: React.FC<CardConnectorProps> = ({
             pointerEvents="none"
         >
             <Svg
-                width={totalW}
+                width={totalWidth}
                 height={height}
-                viewBox={`0 0 ${totalW} ${height}`}
+                viewBox={`0 0 ${totalWidth} ${height}`}
                 style={{
                     marginLeft: -overlap,
                     marginRight: -overlap,
                 }}
             >
-                {/* Top Bridge (adjacent to top badges) */}
                 {renderBridge(topBridgeY, 'top-bridge')}
-
-                {/* Bottom Bridge (level with Start Learning button) */}
                 {renderBridge(bottomBridgeY, 'bottom-bridge')}
             </Svg>
         </View>

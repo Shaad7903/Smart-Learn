@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
     View,
-    TouchableOpacity,
-    Image,
+    Pressable,
     StyleSheet,
+    Animated,
+    Easing,
     ImageSourcePropType,
 } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
@@ -17,12 +18,41 @@ const TAB_ICONS: Record<string, ImageSourcePropType> = {
     Profile: require('../../assets/vectors/Profile.png'),
 };
 
+const tabButtonSize = 56;
+const tabGap = 1;
+const tabStep = tabButtonSize + tabGap;
+const smoothEase = Easing.bezier(0.16, 1, 0.3, 1);
+
 export const CustomTabBar: React.FC<BottomTabBarProps> = ({
     state,
     descriptors,
     navigation,
 }) => {
     const insets = useSafeAreaInsets();
+    const indicatorPosition = useRef(new Animated.Value(state.index * tabStep)).current;
+
+    const tabAnimations = useRef(
+        state.routes.map((routeItem, index) => new Animated.Value(index === state.index ? 1 : 0))
+    ).current;
+
+    useEffect(() => {
+        Animated.parallel([
+            Animated.timing(indicatorPosition, {
+                toValue: state.index * tabStep,
+                duration: 280,
+                easing: smoothEase,
+                useNativeDriver: true,
+            }),
+            ...tabAnimations.map((animation, index) =>
+                Animated.timing(animation, {
+                    toValue: index === state.index ? 1 : 0,
+                    duration: 280,
+                    easing: smoothEase,
+                    useNativeDriver: true,
+                })
+            ),
+        ]).start();
+    }, [state.index, indicatorPosition, tabAnimations]);
 
     const bottomOffset = Math.max(insets.bottom, 12) + 8;
 
@@ -32,57 +62,87 @@ export const CustomTabBar: React.FC<BottomTabBarProps> = ({
             style={[styles.containerWrapper, { bottom: bottomOffset }]}
         >
             <View style={styles.pillContainer}>
-                {state.routes.map((route, index) => {
-                    const isFocused = state.index === index;
-                    const { options } = descriptors[route.key];
+                <View style={styles.slotsRow} pointerEvents="none">
+                    {state.routes.map((route) => (
+                        <View key={`slot-${route.key}`} style={styles.slotCircle} />
+                    ))}
+                </View>
 
-                    const iconSource = TAB_ICONS[route.name] ?? TAB_ICONS.Home;
+                <Animated.View
+                    pointerEvents="none"
+                    style={[
+                        styles.activeIndicator,
+                        {
+                            transform: [{ translateX: indicatorPosition }],
+                        },
+                    ]}
+                />
 
-                    const onPress = () => {
-                        const event = navigation.emit({
-                            type: 'tabPress',
-                            target: route.key,
-                            canPreventDefault: true,
+                <View style={styles.buttonsRow}>
+                    {state.routes.map((route, index) => {
+                        const { options } = descriptors[route.key];
+                        const iconSource = TAB_ICONS[route.name] ?? TAB_ICONS.Home;
+                        const isFocused = state.index === index;
+
+                        const onPress = () => {
+                            const event = navigation.emit({
+                                type: 'tabPress',
+                                target: route.key,
+                                canPreventDefault: true,
+                            });
+
+                            if (!isFocused && !event.defaultPrevented) {
+                                navigation.navigate(route.name);
+                            }
+                        };
+
+                        const onLongPress = () => {
+                            navigation.emit({
+                                type: 'tabLongPress',
+                                target: route.key,
+                            });
+                        };
+
+                        const activeIconOpacity = tabAnimations[index];
+                        const inactiveIconOpacity = tabAnimations[index].interpolate({
+                            inputRange: [0, 1],
+                            outputRange: [1, 0],
                         });
 
-                        if (!isFocused && !event.defaultPrevented) {
-                            navigation.navigate(route.name);
-                        }
-                    };
-
-                    const onLongPress = () => {
-                        navigation.emit({
-                            type: 'tabLongPress',
-                            target: route.key,
-                        });
-                    };
-
-                    return (
-                        <TouchableOpacity
-                            key={route.key}
-                            accessibilityRole="button"
-                            accessibilityState={isFocused ? { selected: true } : {}}
-                            accessibilityLabel={options.tabBarAccessibilityLabel ?? route.name}
-                            testID={options.tabBarButtonTestID}
-                            onPress={onPress}
-                            onLongPress={onLongPress}
-                            activeOpacity={0.8}
-                            style={[
-                                styles.tabButton,
-                                isFocused ? styles.activeTabButton : styles.inactiveTabButton,
-                            ]}
-                        >
-                            <Image
-                                source={iconSource}
-                                style={[
-                                    styles.icon,
-                                    isFocused ? styles.activeIcon : styles.inactiveIcon,
-                                ]}
-                                resizeMode="contain"
-                            />
-                        </TouchableOpacity>
-                    );
-                })}
+                        return (
+                            <Pressable
+                                key={route.key}
+                                accessibilityRole="button"
+                                accessibilityState={isFocused ? { selected: true } : {}}
+                                accessibilityLabel={options.tabBarAccessibilityLabel ?? route.name}
+                                testID={options.tabBarButtonTestID}
+                                onPress={onPress}
+                                onLongPress={onLongPress}
+                                style={styles.tabButton}
+                            >
+                                <Animated.Image
+                                    source={iconSource}
+                                    style={[
+                                        styles.icon,
+                                        styles.inactiveIcon,
+                                        { opacity: inactiveIconOpacity },
+                                    ]}
+                                    resizeMode="contain"
+                                />
+                                <Animated.Image
+                                    source={iconSource}
+                                    style={[
+                                        styles.icon,
+                                        styles.activeIcon,
+                                        styles.absoluteIcon,
+                                        { opacity: activeIconOpacity },
+                                    ]}
+                                    resizeMode="contain"
+                                />
+                            </Pressable>
+                        );
+                    })}
+                </View>
             </View>
         </View>
     );
@@ -98,33 +158,56 @@ const styles = StyleSheet.create({
         backgroundColor: 'transparent',
     },
     pillContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
+        position: 'relative',
         backgroundColor: '#F4F3F3B2',
         borderRadius: 40,
         paddingHorizontal: 8,
         paddingVertical: 6,
-        gap: 1,
         borderWidth: 1,
         borderColor: 'rgba(0, 0, 0, 0.04)',
     },
+    slotsRow: {
+        flexDirection: 'row',
+        gap: tabGap,
+    },
+    slotCircle: {
+        width: tabButtonSize,
+        height: tabButtonSize,
+        borderRadius: tabButtonSize / 2,
+        backgroundColor: '#FFFFFF',
+    },
+    activeIndicator: {
+        position: 'absolute',
+        left: 8,
+        top: 6,
+        width: tabButtonSize,
+        height: tabButtonSize,
+        borderRadius: tabButtonSize / 2,
+        backgroundColor: PRIMARY_COLOR,
+        zIndex: 1,
+    },
+    buttonsRow: {
+        position: 'absolute',
+        left: 8,
+        top: 6,
+        flexDirection: 'row',
+        gap: tabGap,
+        zIndex: 2,
+    },
     tabButton: {
-        width: 56,
-        height: 56,
-        borderRadius: 28,
+        width: tabButtonSize,
+        height: tabButtonSize,
+        borderRadius: tabButtonSize / 2,
         alignItems: 'center',
         justifyContent: 'center',
-    },
-    activeTabButton: {
-        backgroundColor: PRIMARY_COLOR,
-    },
-    inactiveTabButton: {
-        backgroundColor: '#FFFFFF',
+        position: 'relative',
     },
     icon: {
         width: 24,
         height: 24,
+    },
+    absoluteIcon: {
+        position: 'absolute',
     },
     activeIcon: {
         tintColor: '#FFFFFF',
