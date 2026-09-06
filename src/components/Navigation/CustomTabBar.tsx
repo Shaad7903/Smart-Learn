@@ -163,8 +163,6 @@ const styles = StyleSheet.create({
         borderRadius: 40,
         paddingHorizontal: 8,
         paddingVertical: 6,
-        borderWidth: 1,
-        borderColor: 'rgba(0, 0, 0, 0.04)',
     },
     slotsRow: {
         flexDirection: 'row',

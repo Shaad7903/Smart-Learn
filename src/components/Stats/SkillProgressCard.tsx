@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     ScrollView,
@@ -12,13 +12,24 @@ import Svg, {
     Pattern,
     Path,
     Rect,
-    Circle,
     Text as SvgText,
 } from 'react-native-svg';
 import { ChevronDown } from 'lucide-react-native';
 import { BlurView } from '@sbaiahmed1/react-native-blur';
+import Animated, {
+    useSharedValue,
+    useAnimatedStyle,
+    useAnimatedProps,
+    withTiming,
+    withDelay,
+    Easing,
+    LinearTransition,
+} from 'react-native-reanimated';
 import Text from '../Text';
 import { PRIMARY_COLOR } from '../../config/themes';
+
+const smoothEase = Easing.bezier(0.16, 1, 0.3, 1);
+const AnimatedRect = Animated.createAnimatedComponent(Rect);
 
 export interface BarData {
     day: string;
@@ -50,6 +61,54 @@ const BARS_DATA: BarData[] = [
     { day: 'Sun', height: 145 },
 ];
 
+interface AnimatedBarProps {
+    barX: number;
+    baseLineY: number;
+    targetHeight: number;
+    barWidth: number;
+    barRadius: number;
+    isActive?: boolean;
+    index: number;
+}
+
+const AnimatedBar: React.FC<AnimatedBarProps> = ({
+    barX,
+    baseLineY,
+    targetHeight,
+    barWidth,
+    barRadius,
+    isActive,
+    index,
+}) => {
+    const growthProgress = useSharedValue(0);
+
+    useEffect(() => {
+        growthProgress.value = withDelay(
+            index * 45,
+            withTiming(1, { duration: 520, easing: smoothEase })
+        );
+    }, [growthProgress, index]);
+
+    const animatedProps = useAnimatedProps(() => {
+        const currentHeight = Math.max(growthProgress.value * targetHeight, 0);
+        return {
+            y: baseLineY - currentHeight,
+            height: currentHeight,
+        };
+    });
+
+    return (
+        <AnimatedRect
+            x={barX}
+            width={barWidth}
+            rx={barRadius}
+            ry={barRadius}
+            fill={isActive ? '#1C274C' : 'url(#diagonalStripes)'}
+            animatedProps={animatedProps}
+        />
+    );
+};
+
 export const SkillProgressCard: React.FC<SkillProgressCardProps> = ({
     title = 'Skill progress',
     subtitle = 'Avg improvement this week',
@@ -77,6 +136,25 @@ export const SkillProgressCard: React.FC<SkillProgressCardProps> = ({
 
     const activeBar = BARS_DATA.find((barItem) => barItem.isActive);
     const activeBarY = activeBar ? baseLineY - activeBar.height : 0;
+
+    const badgeScale = useSharedValue(0.7);
+    const badgeOpacity = useSharedValue(0);
+
+    useEffect(() => {
+        badgeScale.value = withDelay(
+            380,
+            withTiming(1, { duration: 320, easing: smoothEase })
+        );
+        badgeOpacity.value = withDelay(
+            380,
+            withTiming(1, { duration: 260, easing: smoothEase })
+        );
+    }, [badgeScale, badgeOpacity]);
+
+    const badgeAnimatedStyle = useAnimatedStyle(() => ({
+        opacity: badgeOpacity.value,
+        transform: [{ scale: badgeScale.value }],
+    }));
 
     return (
         <View style={[styles.container, style]}>
@@ -163,31 +241,18 @@ export const SkillProgressCard: React.FC<SkillProgressCardProps> = ({
                         const columnWidth = chartWidth / BARS_DATA.length;
                         const centerX = (index + 0.5) * columnWidth;
                         const barX = centerX - barWidth / 2;
-                        const barY = baseLineY - bar.height;
 
                         return (
                             <React.Fragment key={bar.day}>
-                                {bar.isActive ? (
-                                    <Rect
-                                        x={barX}
-                                        y={barY}
-                                        width={barWidth}
-                                        height={bar.height}
-                                        rx={barRadius}
-                                        ry={barRadius}
-                                        fill="#1C274C"
-                                    />
-                                ) : (
-                                    <Rect
-                                        x={barX}
-                                        y={barY}
-                                        width={barWidth}
-                                        height={bar.height}
-                                        rx={barRadius}
-                                        ry={barRadius}
-                                        fill="url(#diagonalStripes)"
-                                    />
-                                )}
+                                <AnimatedBar
+                                    barX={barX}
+                                    baseLineY={baseLineY}
+                                    targetHeight={bar.height}
+                                    barWidth={barWidth}
+                                    barRadius={barRadius}
+                                    isActive={bar.isActive}
+                                    index={index}
+                                />
 
                                 <SvgText
                                     x={centerX}
@@ -206,10 +271,11 @@ export const SkillProgressCard: React.FC<SkillProgressCardProps> = ({
                 </Svg>
 
                 {activeBar && (
-                    <View
+                    <Animated.View
                         style={[
                             styles.badgeContainer,
                             { top: activeBarY - 25 },
+                            badgeAnimatedStyle,
                         ]}
                         pointerEvents="none"
                     >
@@ -223,7 +289,7 @@ export const SkillProgressCard: React.FC<SkillProgressCardProps> = ({
                         <Text weight="semiBold" style={styles.badgeText}>
                             {activeBar.badgeText || '+30%'}
                         </Text>
-                    </View>
+                    </Animated.View>
                 )}
             </View>
         </View>

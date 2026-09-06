@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View,
     Image,
@@ -8,6 +8,15 @@ import {
     ViewStyle,
 } from 'react-native';
 import { X } from 'lucide-react-native';
+import Animated, {
+    useSharedValue,
+    useAnimatedStyle,
+    withTiming,
+    withDelay,
+    Easing,
+    FadeOut,
+    LinearTransition,
+} from 'react-native-reanimated';
 import Text from '../Text';
 
 export interface DayProgress {
@@ -25,6 +34,7 @@ export interface StreakCardProps {
 }
 
 const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const smoothEase = Easing.bezier(0.16, 1, 0.3, 1);
 
 export const StreakCard: React.FC<StreakCardProps> = ({
     currentScore = 3822,
@@ -36,6 +46,23 @@ export const StreakCard: React.FC<StreakCardProps> = ({
     const [isTipVisible, setIsTipVisible] = useState(true);
 
     const fillPercent = Math.min(Math.max(((activeDayIndex + 0.5) / DAYS.length) * 100, 0), 100);
+
+    const fillProgress = useSharedValue(0);
+    const flameScale = useSharedValue(0.7);
+
+    useEffect(() => {
+        fillProgress.value = withTiming(fillPercent, { duration: 680, easing: smoothEase });
+        flameScale.value = withDelay(200, withTiming(1, { duration: 380, easing: smoothEase }));
+    }, [fillPercent, fillProgress, flameScale]);
+
+    const activeTrackStyle = useAnimatedStyle(() => ({
+        width: `${fillProgress.value}%`,
+    }));
+
+    const flamePositionStyle = useAnimatedStyle(() => ({
+        left: `${fillProgress.value}%`,
+        transform: [{ scale: flameScale.value }],
+    }));
 
     return (
         <View style={[styles.container, style]}>
@@ -56,7 +83,7 @@ export const StreakCard: React.FC<StreakCardProps> = ({
 
             <View style={styles.trackerWrapper}>
                 <View style={styles.trackContainer}>
-                    <View style={[styles.activeTrackFill, { width: `${fillPercent}%` }]} />
+                    <Animated.View style={[styles.activeTrackFill, activeTrackStyle]} />
 
                     <View style={styles.ticksRow}>
                         {DAYS.map((dayItem, index) => {
@@ -78,10 +105,10 @@ export const StreakCard: React.FC<StreakCardProps> = ({
                         })}
                     </View>
 
-                    <View
+                    <Animated.View
                         style={[
                             styles.flameBadgeContainer,
-                            { left: `${fillPercent}%` },
+                            flamePositionStyle,
                         ]}
                     >
                         <View style={styles.flameBadge}>
@@ -91,7 +118,7 @@ export const StreakCard: React.FC<StreakCardProps> = ({
                                 resizeMode="contain"
                             />
                         </View>
-                    </View>
+                    </Animated.View>
                 </View>
 
                 <View style={styles.daysLabelsRow}>
@@ -121,7 +148,11 @@ export const StreakCard: React.FC<StreakCardProps> = ({
             </View>
 
             {isTipVisible && (
-                <View style={styles.tipBanner}>
+                <Animated.View
+                    exiting={FadeOut.duration(200)}
+                    layout={LinearTransition.duration(220)}
+                    style={styles.tipBanner}
+                >
                     <View style={styles.tipLeftContent}>
                         <Image
                             source={require('../../assets/images/AIBuddy.png')}
@@ -140,7 +171,7 @@ export const StreakCard: React.FC<StreakCardProps> = ({
                     >
                         <X size={15} color="#080C1E" strokeWidth={2.4} />
                     </Pressable>
-                </View>
+                </Animated.View>
             )}
         </View>
     );

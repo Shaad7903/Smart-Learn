@@ -304,8 +304,8 @@ const styles = StyleSheet.create({
     mainContainer: {
         flex: 1,
         paddingHorizontal: 20,
-        paddingTop: Math.round(40 * scale),
-        paddingBottom: Math.round(20 * scale),
+        paddingTop: Math.round(30 * scale),
+        paddingBottom: Math.round(10 * scale),
         justifyContent: 'space-between',
         alignItems: 'center',
     },
