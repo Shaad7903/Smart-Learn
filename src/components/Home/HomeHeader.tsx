@@ -9,6 +9,7 @@ import {
 import Svg, { Path } from 'react-native-svg';
 import Text from '../Text';
 import { TEXT_COLOR } from '../../config/themes';
+import { ChevronDown } from 'lucide-react-native';
 
 export interface HomeHeaderProps {
     name?: string;
@@ -66,15 +67,7 @@ export const HomeHeader: React.FC<HomeHeaderProps> = ({
                         resizeMode="cover"
                     />
                     <Text weight="medium" style={styles.languageText}>{selectedLanguage}</Text>
-                    <Svg width={12} height={12} viewBox="0 0 24 24" fill="none">
-                        <Path
-                            d="M6 9L12 15L18 9"
-                            stroke="#1C274C"
-                            strokeWidth={2.5}
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                        />
-                    </Svg>
+                    <ChevronDown size={18} color='#141B34' />
                 </Pressable>
 
                 <Pressable

@@ -1,4 +1,23 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# SmartLearn 🎓
+
+SmartLearn is a modern, interactive React Native educational mobile application designed to empower early learning through fun lessons, phonetics, AI buddies, and progress tracking.
+
+---
+
+## 🧭 Navigation (What to Press & Where It Goes)
+
+| From Screen | What to Press | Takes You To |
+| :--- | :--- | :--- |
+| **Splash** | *Wait ~2.6 seconds (automatic)* | **Onboarding** |
+| **Onboarding** | Press **"Sign up"** or **"Log in"** button | **Home** |
+| **Home** | Press **"Letters" card** (or its **"Start"** button) | **Learn Letters** |
+| **Home** | Press **AI icon** (bottom bar) | **AI** screen |
+| **Home** | Press **Stats icon** (bottom bar) | **Stats** screen |
+| **Home** | Press **Profile icon** (bottom bar) | **Profile** screen |
+| **Learn Letters** | Press **Back arrow (←)** at top left | Return to **Home** |
+| **Any Tab (Home / AI / Stats / Profile)** | Press any icon in the bottom bar | Switch directly between **Home**, **AI**, **Stats**, and **Profile** |
+
+---
 
 # Getting Started
 
